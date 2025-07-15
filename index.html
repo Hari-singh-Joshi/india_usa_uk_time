@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>World Clock - India, USA, UK</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #222;
+    color: #eee;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .clock-container {
+    display: flex;
+    gap: 40px;
+    background: #333;
+    padding: 20px 40px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px #444;
+  }
+  .clock {
+    text-align: center;
+    min-width: 150px;
+  }
+  .city {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+  .time {
+    font-size: 1.8rem;
+    font-family: 'Courier New', Courier, monospace;
+  }
+</style>
+</head>
+<body>
+  <div class="clock-container">
+    <div class="clock" id="india">
+      <div class="city">India (IST)</div>
+      <div class="time">--:--:--.---</div>
+    </div>
+    <div class="clock" id="usa">
+      <div class="city">USA (New York, EST)</div>
+      <div class="time">--:--:--.---</div>
+    </div>
+    <div class="clock" id="uk">
+      <div class="city">UK (London, GMT)</div>
+      <div class="time">--:--:--.---</div>
+    </div>
+  </div>
+
+<script>
+  // Create formatters without seconds or milliseconds for each timezone
+  const formatOptions = {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+    timeZoneName: 'short'
+  };
+
+  const indiaFormatter = new Intl.DateTimeFormat('en-US', {...formatOptions, timeZone: 'Asia/Kolkata'});
+  const usaFormatter = new Intl.DateTimeFormat('en-US', {...formatOptions, timeZone: 'America/New_York'});
+  const ukFormatter = new Intl.DateTimeFormat('en-GB', {...formatOptions, timeZone: 'Europe/London'});
+
+  function formatTimeWithMs(date, formatter) {
+    // Format hours, minutes, seconds from Intl API
+    const parts = formatter.formatToParts(date);
+    const h = parts.find(p => p.type === 'hour').value;
+    const m = parts.find(p => p.type === 'minute').value;
+    const s = parts.find(p => p.type === 'second').value;
+    // Get milliseconds from original date (local), adjust if needed for display
+    // For simplicity, just show the local milliseconds since Intl API doesn't support ms
+    const ms = String(date.getMilliseconds()).padStart(3, '0');
+    return `${h}:${m}:${s}.${ms}`;
+  }
+
+  function updateClocks() {
+    const now = new Date();
+    document.querySelector("#india .time").textContent = formatTimeWithMs(now, indiaFormatter);
+    document.querySelector("#usa .time").textContent = formatTimeWithMs(now, usaFormatter);
+    document.querySelector("#uk .time").textContent = formatTimeWithMs(now, ukFormatter);
+  }
+
+  setInterval(updateClocks, 1);
+  updateClocks();
+</script>
+</body>
+</html>
